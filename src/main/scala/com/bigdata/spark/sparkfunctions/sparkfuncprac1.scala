@@ -34,7 +34,14 @@ object sparkfuncprac1 {
 |FL   |Homestead   |[Pamella]                                                           |
 |SC   |Spartanburg |[Eun]                                                               |
     */
-
+ //In each city or state ..list of people who live
+    //collect_list is an aggregate function with list of duplicates
+    /* uma ,[tv,tv,mobile]
+      veeana,[tv,mob,toys,toys,tv,tv,mob]
+    //collect_set ia an aggregation function with duplicates eliminated
+    uma,[tv,mobile]
+    veeana,[tv,toys,mob]
+     */
     val res=df.groupBy($"state",$"city").agg(collect_list($"first_name").alias("names"))
    /*
    https://spoddutur.github.io/spark-notes/distribution_of_executors_cores_and_memory_for_spark_application.html
