@@ -30,6 +30,7 @@ object sparkudf {
     }
 
     //spark don't know anything but support udf.. convert function to udf
+    //No need of _ as its already a function
     val uf = udf(offer)
     //uf: org.apache.spark.sql.expressions.UserDefinedFunction = UserDefinedFunction(<function1>,StringType,Some(List(StringType)))
     val res = df.withColumn("weekendoffer",uf($"state"))
@@ -45,6 +46,9 @@ object sparkudf {
     }
 
     //method to function
+    //251
+    //
+    //'method' is the object-oriented word for 'function'
     //offer1 _ with underscore method gets converted to function
     // _ ensures that offer is a function
 
@@ -57,6 +61,22 @@ object sparkudf {
 }
 
 /*
+A method is on an object.
+A function is independent of an object
+
+A function is a piece of code that is called by name. It can be passed data to operate on
+(i.e. the parameters) and can optionally return data (the return value). All data that
+ is passed to a function is explicitly passed.
+
+A method is a piece of code that is called by a name that is associated with an object.
+In most respects it is identical to a function except for two key differences:
+
+  -A method is implicitly passed the object on which it was called.
+   -A method is able to operate on data that is contained within the class (remembering that an
+ object is an instance of a class - the class is the definition, the object is an instance of
+ that data).
+
+=================================================
 Simple method:
 def m1(x: Int) = x + x
 m1(2)  // 4
