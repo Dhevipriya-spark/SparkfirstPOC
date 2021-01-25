@@ -38,11 +38,6 @@ Aggregate: 			min, max, avg, count, and sum.
 Ranking:			rank, dense_rank, percent_rank, row_num, and ntile
 Analytical: 		cume_dist, lag, and lead
 Custom boundary: 		rangeBetween and rowsBetween
-
-
-
-
-
  */
 
 object sparkWindowsFunctions {
@@ -103,11 +98,13 @@ val columns=Seq("DepName","EmpNo","Salary")
     row_num.show()
 
     //percent_rank
-    //This function will return the relative (percentile) rank within the partition.
+    // rank+percent=percent rank (Skip rank when there is a duplicate)
+    // This function will return the relative (percentile) rank within the partition.
     val percent_rnk=df.withColumn("percent_rnk",percent_rank().over(winSpec))
     percent_rnk.show()
 
     //ntile
+
     //This function can further sub-divide the window into n groups based on a window specification or partition. For example, if we need to divide the departments further into say three groups we can specify ntile as 3.
     //ntile() window function returns the relative rank of result rows within a window partition. In below example we have used 2 as an argument to ntile hence it returns ranking between 2 values (1 and 2)
     val ntile_df=df.withColumn("NTile",ntile(3).over(winSpec))

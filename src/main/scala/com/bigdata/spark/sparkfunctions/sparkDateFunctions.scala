@@ -143,9 +143,26 @@ object sparkDateFunctions {
    //how many seconds completed from 1st jan 1970
     val res16=res1.withColumn("unixtimestamp",unix_timestamp(current_timestamp()))
                   .withColumn("currenttimestamp",current_timestamp())
-    res16.show
+      .withColumn("Convert_unixts_to_normalts",from_unixtime($"unixtimestamp"))
+      .withColumn("pst_ist",from_utc_timestamp(from_unixtime($"unixtimestamp"),"IST"))//if london time 9:38am whats indian time(5:30 hrs ahead)
+
+
+    res16.show(false)
 
 
     spark.stop()
   }
 }
+
+/*from_utc_timestamp
+    Given a timestamp like '2017-07-14 02:40:00.0', interprets it as a time in UTC, and renders
+   * that time as a timestamp in the given time zone. For example, 'GMT+1' would yield
+   * '2017-07-14 03:40:00.0'.
+   *
+   * @param ts A date, timestamp or string. If a string, the data must be in a format that can be
+   *           cast to a timestamp, such as `yyyy-MM-dd` or `yyyy-MM-dd HH:mm:ss.SSSS`
+   * @param tz A string detailing the time zone that the input should be adjusted to, such as
+   *           `Europe/London`, `PST` or `GMT+5`
+   * @return A timestamp, or null if `ts` was a string that could not be cast to a timestamp or
+   *         `tz` was an invalid value
+     */
