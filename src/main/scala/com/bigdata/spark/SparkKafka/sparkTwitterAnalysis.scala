@@ -24,10 +24,30 @@ object sparkTwitterAnalysis {
     System.setProperty("twitter4j.oauth.accessTokenSecret", Accesstokensecret)
     //val lines = ssc.socketTextStream("localhost", 9999)
 
-    val searchFilter = "spark,hive,hbase,artificialiintelligence"
+    val searchFilter = "spark,hive,hbase,nifi,cassandra,kafka"
     // create dstream
     val tweetStream = TwitterUtils.createStream(ssc, None, Seq(searchFilter.toString))
-    tweetStream.print()
+    // tweetStream.print()
+    //processing
+    tweetStream.foreachRDD { abc =>
+      val spark = SparkSession.builder.config(abc.sparkContext.getConf).getOrCreate()
+      import spark.implicits._
+      val df = abc.map(x=>(x.getUser.getScreenName(), x.getText())).toDF("user","tweet").withColumn("dates",current_date())
+      df.show(2,false)
+     // df.createOrReplaceTempView("tab")
+      //val res = spark.sql("select * from tab where tweets lik")
+     // val res = df.where($"tweet".like("spark") )
+      //res.show(false)
+      //res.write.format("parquet").partitionBy("dates").saveAsTable("Twittertab")
+      //sqoop ...jab ...
+      //udf
+      //
+      //2021-jan-30.... 1 lakh
+      //2021-jan-31 .... 59k
+      //
+      //021-feb-4...90k
+
+    }
 /*
     tweetStream.foreachRDD { x =>
       val spark = SparkSession.builder.config(x.sparkContext.getConf).getOrCreate()
