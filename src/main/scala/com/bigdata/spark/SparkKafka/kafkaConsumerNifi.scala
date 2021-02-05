@@ -8,6 +8,31 @@ import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
 import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
 import org.apache.spark.streaming.kafka010._
 import org.apache.spark.sql.functions._
+/*
+Nifi is not only data ingestion but a unified platform to manage workflow
+
+Apache NiFi and Apache Kafka are two different tools with different use-cases that may
+slightly overlap. Here is my understanding of the purpose of the two projects.
+
+NiFi is "An easy to use, powerful, and reliable system to process and distribute data."
+
+It is a visual tool (with a REST api) that implements flow-based programming to enable
+the user to craft flows that will take data from a large variety of different sources,
+perform enrichment, routing, etc on the data as it's being processed, and output the
+result to a large variety of destinations. During this process, it captures metadata
+(provenance) on what has happened to each piece of data (FlowFile) as it made its way
+through the Flow for audit logging and troubleshooting purposes.
+
+"Apache Kafka is publish-subscribe messaging rethought as a distributed commit log"
+
+It is a distributed implementation of the publish-subscribe pattern that allows
+developers to connect programs to each other in different languages and across a large
+number of machines. It is more of a building block for distributed computing than it is
+ an all-in-one solution for processing data
+
+ */
+
+//Nifi get data from rest api(invoke http) and store the data in kafka brokers(publishkafkarecord2.0)
 object kafkaConsumerNifi {
   def main(args: Array[String]) {
     val spark = SparkSession.builder.master("local[*]").config("spark.streaming.kafka.allowNonConsecutiveOffsets","true").appName("kafkaConsumer").getOrCreate()
@@ -32,24 +57,25 @@ object kafkaConsumerNifi {
     // dstream created
 
     val lines=  stream.map(record =>  record.value)
-    //lines.print()
-    lines.foreachRDD { x =>
+   // lines.print()
+   lines.foreachRDD { x =>
       val spark = SparkSession.builder.config(x.sparkContext.getConf).getOrCreate()
       import spark.implicits._
-      //val reg = "(?P<ip>.?) (?P<remote_log_name>.?) (?P<userid>.?) \[(?P<date>.?)(?= ) (?P<timezone>.?)\] \"(?P<request_method>.?) (?P<path>.?)(?P<request_version> HTTP/.)?\" (?P<status>.?) (?P<length>.?) \"(?P<referrer>.?)\" \"(?P<user_agent>.?)\" (?P<session_id>.?) (?P<generation_time_micro>.?) (?P<virtual_host>.*)"
-      //val path = x.toString()
+
       val df1 = spark.read.json(x)
       val df = df1.withColumn("t",explode($"results")).drop($"results")
-        .select("t.user.picture.","t.user.name.","t.user.", "t.user.location.")
+        .select("nationality","seed","t.user.picture.*","t.user.name.*","t.user.*", "t.user.location.*")
         .drop("picture","name","location")
 
       df.createOrReplaceTempView("tab")
-      val url ="jdbc:oracle:thin:@//bharathidb.c4nevuk0looq.us-east-2.rds.amazonaws.com:1521/ORCL"
+     // df.show
+     //df.printSchema()
+   val url ="jdbc:oracle:thin:@//bharathidb.c4nevuk0looq.us-east-2.rds.amazonaws.com:1521/ORCL"
       val prop = new  java.util.Properties()
       prop.setProperty("user","ousername")
       prop.setProperty("password","opassword")
       prop.setProperty("driver","oracle.jdbc.driver.OracleDriver")
-      df.write.mode(SaveMode.Overwrite).jdbc(url,"nifidata",prop)
+      df.write.mode(SaveMode.Overwrite).jdbc(url,"nifidata1",prop) //As there is a new columns  we are giving savemode overwrite
       // val df = x.map(x => x.split(" ")).map(x => (x(0), x(3), x(4))).toDF("ip", "dt", "tz")
 
       // val df = spark.read.option("","true").json(x).withColumn("newcol",explode($"results")).drop($"results").select($"nationality",$"seed",$"newcol.user.",$"newcol.user.location.",$"newcol.user.name.*").drop("location","name","picture")
@@ -61,12 +87,6 @@ object kafkaConsumerNifi {
       //df.write.mode(SaveMode.Append).saveAsTable("hiv")
 
 
-      /* df.createOrReplaceTempView("tab")
-      val res = spark.sql("select * from tab where city='mas'")
-      val res1 = spark.sql("select * from tab where city='del'")
-      res.write.mode(SaveMode.Append).jdbc(ourl,"masinfo",oprop)
-      res1.write.mode(SaveMode.Append).jdbc(ourl,"delhiinfo",oprop)
-*/
     }
     ssc.start()             // Start the computation
     ssc.awaitTermination()
