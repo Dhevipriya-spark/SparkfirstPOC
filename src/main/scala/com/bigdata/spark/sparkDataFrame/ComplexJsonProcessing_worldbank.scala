@@ -24,7 +24,7 @@ JSON.parse()
 So, if you receive data from a server, in JSON format, you can use it like any other JavaScript object.
 ============
 oracle does not support array ,struct etc so we need to change to primitive datatype
-
+https://medium.com/expedia-group-tech/working-with-json-in-apache-spark-1ecf553c2a8c
 
  */
 object ComplexJsonProcessing_worldbank {
@@ -38,6 +38,7 @@ object ComplexJsonProcessing_worldbank {
 
     val data="file:///D:\\bigdata\\datasets\\world_bank.json"
     val df=spark.read.format("json").load(data)
+    //val df=spark.read.json(data)
     df.printSchema()
     //data cleaning process
   // *1*if you have struct column-if you have struct use parent column.child column eg:theme1  --theme1.name,theme1.percent
