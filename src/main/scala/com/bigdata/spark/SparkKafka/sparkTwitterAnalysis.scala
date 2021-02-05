@@ -17,7 +17,7 @@ object sparkTwitterAnalysis {
     val APIsecretkey= "vV7ebTfoZVT9s34GF8RaHNuwz7YUamN4adcBXrelJlaLnSLSwY"
     val Accesstoken = "181460431-O98O3vCJ7jI0uR8kixfLfGBHdufktOOMX4oYuStF"
     val Accesstokensecret ="mPSW1B5WE8F2B0rJvZNjoplhotifKbouDkODIJOAioOZn"
-
+     //my application communicating  with twitter with the help of below keys
     System.setProperty("twitter4j.oauth.consumerKey", APIkey)
     System.setProperty("twitter4j.oauth.consumerSecret", APIsecretkey)
     System.setProperty("twitter4j.oauth.accessToken", Accesstoken)
@@ -28,6 +28,8 @@ object sparkTwitterAnalysis {
     // create dstream
     val tweetStream = TwitterUtils.createStream(ssc, None, Seq(searchFilter.toString))
     // tweetStream.print()
+
+
     //processing
     tweetStream.foreachRDD { abc =>
       val spark = SparkSession.builder.config(abc.sparkContext.getConf).getOrCreate()
@@ -36,12 +38,14 @@ object sparkTwitterAnalysis {
       df.show(2,false)
      // df.createOrReplaceTempView("tab")
       //val res = spark.sql("select * from tab where tweets lik")
-     // val res = df.where($"tweet".like("spark") )
-      //res.show(false)
+     val res = df.where($"tweet".like("spark") && $"tweet".contains("http"))
+      res.show(false)
+
+      //date column and partitionBy is used to get one month old data stored in respective partition and then compare live data and old data
       //res.write.format("parquet").partitionBy("dates").saveAsTable("Twittertab")
       //sqoop ...jab ...
       //udf
-      //
+
       //2021-jan-30.... 1 lakh
       //2021-jan-31 .... 59k
       //
@@ -79,3 +83,14 @@ object sparkTwitterAnalysis {
     ssc.awaitTermination()
   }
 }
+
+/*
+To get old one month before data..store it in hive with partition
+  to get incremental data run sqoop with incremental option
+  to get incremental data use can even create a udf in spark ===============
+
+offset is not possible in live data
+kafka it is possible to do live processing and incremental data with below option or store with date based column(partition)
+The minimum age of a log file to be eligible for deletion due to age
+log.retention.hours=168
+ */
