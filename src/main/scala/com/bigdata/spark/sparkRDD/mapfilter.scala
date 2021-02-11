@@ -77,7 +77,7 @@ object mapfilter {
     resfinal1.collect.foreach(println)
     resfinal1.toDebugString
     //frontend sc.textfile backend calling hadooprdd..//frontend map..filter backend mappartitionrdd
-     //spark uses HAdoop RDDi to read the data from any hadoop supported filesystem.
+     //spark uses HAdoop RDD API to read the data from any hadoop supported filesystem.
     //HadoopRDD- if any sc.textfile is present that sc.textfile calls hadooprdd API
     // Spark uses hadoopRDD API to read any hadoop supported filesystem file & get the data from this path and creates hadooprdd.
     // then sc.textfile creates mappartitionRDD.then for filter map etc mappartitionRDD gets created...
@@ -155,7 +155,7 @@ object mapfilter {
 //if there are 100 maps 200filters each map 10mb memory then 1 gb map and 2gb filter
 //so in all3 gb memory used .so lot of memory is consumed.so as spark is doing the computation stage by stage
 //Allthe maps ..filter if they in lakhs are processed ina second with in a stage.so the resources are utilised effectively
-//thais why spark is processing stagebystage and not method by method i.e combining transformations.
+//that  is why spark is processing stagebystage and not method by method i.e combining transformations.
 
 //Map=Apply a logic on top of each and every element.No of input and output elements length must be same
 //Mapusually apply a logic on top of specific columns..array convert to tuple use map.

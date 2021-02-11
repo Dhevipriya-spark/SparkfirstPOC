@@ -16,26 +16,27 @@ object sparkActionPractice1 {
 
     //getNumPartitions()- Returns the number of partitions in RDD
     val xrdd=sc.parallelize(Array(1,2,3),2)
-    val xsize=xrdd.partitions.size
-    val xout=xrdd.glom().collect()
+      val xsize=xrdd.partitions.size
+     val xout=xrdd.glom().collect() //glom -Return an RDD created by coalescing all elements within each partition into an array.
+    //res12: Array[Array[Int]] = Array(Array(1, 2, 3), Array(4, 5, 6))
 
     //collect()-Return all items in the RDD to the driver in a single list
-    val yout=xrdd.collect()
+    val yout=xrdd.collect() //Array[Int] = Array(1, 2, 3)
     println(yout)
 
 
     //Reduce()-Aggregate all the elements of the RDD by applying a user function pairwise to elements and partial results,and returns the results to the driver.
      val redrdd=sc.parallelize(Array(1,2,3,4))
      val redout=redrdd.reduce(_+_)
-     println(redrdd.collect.mkString(","))
+     println(redrdd.collect.mkString(",")) ////res11: String = 1,2,3,4
      println(redout)
 
     //Aggregate()-Aggregate all the elements of the RDD by:
     //-applying a user function to combine elements with user-supplied objects
-    //-then combining those user-defines results via a second use function
+    //-then combining those user-defines results via a second user function
     //and finally returning a result to the driver
 
-  /* def seqOp=(data:(Array[Int]),Int),item:Int)=> (data._1 :+ item,data._2 + item)
+ /*  def seqOp=(data:(Array[Int]),Int),item:Int)=>(data._1 :+ item,data._2 + item)
     def combOp= (d1:(Array[Int], Int), d2:(Array[Int], Int)) => (d1._1.union(d2._1), d1._2 + d2._2)
 
     val x= sc.parallelize(Array(1,2,3,4))
@@ -63,6 +64,10 @@ object sparkActionPractice1 {
     val stdrdd=sc.parallelize(Array(2,4,1))
     val stdout=stdrdd.stdev
     println(stdrdd.collect().mkString(","))
+    println(stdout)
+
+    println("Mean:"+meanrdd.mean+"\nStdev:" + stdrdd.stdev)
+
 
     //CountByKey ->Returns a map of keys and counts of thier occurences in the RDD.
     val countrdd=sc.parallelize(Array(('J',"James"),('F',"Fred"),('A',"Anna"),('J',"John")))
@@ -72,8 +77,6 @@ object sparkActionPractice1 {
     //SaveASTextFile->save the RDD to the filesystem indicated in the path
     val saverdd=sc.parallelize(Array(2,4,1))
     saverdd.saveAsTextFile("/temp/demo")
-    val saveout=sc.textFile("/temp/demo")
-    println(saveout.collect().mkString(","))
 
     spark.stop()
   }

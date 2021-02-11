@@ -17,15 +17,15 @@ object sparkTransfpractice1 {
     //MAP :Return a new RDD  by applying a function to each element of this RDD
     val rdd1= spark.sparkContext.parallelize(Array("a","b","c"))
     val res=rdd1.map(x=>(x,1))
-    println(rdd1.collect().mkString(", "))
+    res.collect()    //res4: Array[(String, Int)] = Array((a,1), (b,1), (c,1))
+    rdd1.collect( ) //Array[String] = Array(a, b, c)
+    println(rdd1.collect().mkString(", ")) //res6: String = a,b,c
     println(res.collect().mkString(", "))  //(a,1), (b,1), (c,1)
     println(res.collect().foreach(println))
     /* (a,1)
       (b,1)
-      (c,1)
-      () */
-
-    //Filter:Return a new RDD containing only elements that satisfy a predicate
+      (c,1) */
+ //Return a new RDD containing only the elements that satisfy a predicate.
     val rdd2=spark.sparkContext.parallelize(Array(1,2,3,4,5))
     val res1=rdd2.filter(x=>x%2 ==1)
     println(rdd2.collect().mkString(", "))
@@ -53,7 +53,7 @@ object sparkTransfpractice1 {
      //(A,CompactBuffer(3, 3, 3)),(B,CompactBuffer(3, 2, 1))
 
     //ReduceByKey vs GroupByKey
-    val words=Array("one","two","two","three","three")
+      val words=Array("one","two","two","three","three")
     val wordpairsRDD=sc.parallelize(words).map(word=>(word,1))
     val wordCountsWithReduce= wordpairsRDD.reduceByKey(_+_).collect
     val wordCountsWithGroup=wordpairsRDD.groupByKey().map(t=>(t._1,t._2.sum)).collect
@@ -100,7 +100,7 @@ Note:This operation may be very expensive. If you are grouping in order to perfo
     println(disres.collect().mkString(","))
 
     //Coalesce :Returns a new RDD which is reduced to a smaller number of partitions
-    //Coalesce(numPartitions,shuffle=false)
+   //Coalesce(numPartitions,shuffle=false)
     val coalrdd=sc.parallelize(Array(1,2,3,4,5),3)
     val coalres=coalrdd.coalesce(2)
     val coalin=coalrdd.glom().collect()
